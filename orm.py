@@ -15,11 +15,11 @@ async def get_password_hash(password: str) -> str:
 async def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-async def create_tables():
+async def create_tables() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def create_user(new_user: UserSchema):
+async def create_user(new_user: UserSchema) -> None:
     async with new_session() as session:
         user = UserModels(
             email = new_user.email,
@@ -77,7 +77,7 @@ async def get_user_by_email(email: str):
 
         return result.scalar_one_or_none()
 
-async def get_referrer_by_email(email: str) -> str:
+async def get_referrer_by_email(email: str) -> str | None:
     async with new_session() as session:
         stmt = (
             select(ReferralCode.code)
@@ -89,7 +89,7 @@ async def get_referrer_by_email(email: str) -> str:
         return referrer_code
 
 
-async def get_referrals(referrer_id: int) -> list:
+async def get_referrals(referrer_id: int) -> list | None:
     async with new_session() as session:
         result = await session.execute(
             select(UserModels)
